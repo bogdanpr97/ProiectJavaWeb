@@ -1,0 +1,160 @@
+*
+{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+header
+{
+  grid-area: header;
+}
+
+main
+{
+  grid-area: main;
+  background-color: yellow;
+}
+
+footer
+{
+  grid-area: footer;
+  background-color: black;
+}
+
+sidebar
+{
+  grid-area: sidebar;
+  background-color: green;
+}
+
+.main_grid
+{
+  display: grid;
+  grid-template-columns: 0.25fr 1fr 0.15fr 2fr 0.25fr;
+  grid-template-rows: 0.25fr 0.25fr 0.25fr 1fr 0.25fr 0.25fr 0.25fr;
+  grid-template-areas:
+  ". . . . ."
+  ". header header header ."
+  ". . . . ."
+  ". sidebar . main ."
+  ". . . . ."
+  ". footer footer footer ."
+  ". . . . .";
+}
+
+#container_logo
+{
+  background-color: #1a0000;
+  color: white;
+  text-align: center;
+  font-family: "Cinzel";
+  font-size: 150%;
+  border-radius: 10px;
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
+  padding: 15px;
+  grid-area: container_logo;
+}
+
+#text_logo
+{
+  text-decoration: underline;
+}
+
+#meniu
+{
+  grid-area: meniu;
+}
+
+#meniu ul
+{
+  list-style: none;
+  background-color: #4d0000;
+  border-radius: 10px;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+#meniu ul li
+{
+  display: inline-block;
+  border-right: 2px solid white;
+  background-color: #4d0000;
+}
+
+#meniu ul li a
+{
+  text-decoration: none;
+  color: white;
+  padding: 25px;
+  display: block;
+}
+
+#meniu ul li:last-child
+{
+  border-right: none;
+}
+
+
+#meniu ul li:first-child
+{
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 10px;
+}
+
+#cont_cautare
+{
+  background-color: #4d0000;
+  grid-area: cont;
+  border-bottom-right-radius: 10px;
+  text-align: right;
+  padding-top: 35%;
+  padding-right: 10%;
+}
+
+#cont_cautare a
+{
+  color: white;
+  text-decoration: none;
+}
+
+#cont_cautare a:first-child
+{
+  border-right: 2px solid white;
+  padding: 3%;
+}
+
+#cont_cautare a:last-child
+{
+  padding: 2% 2% 2% 1%;
+}
+
+header
+{
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  grid-template-rows: 1fr 0.5fr;
+  grid-template-areas:
+  "container_logo container_logo"
+  "meniu cont";
+}
+
+#meniu ul li:hover
+{
+  background-color:  #1a0000;
+}
+
+@media screen and (max-width: 765px)
+{
+  #cont_cautare a:first-child
+  {
+    border: 0;
+    display: block
+  }
+  #cont_cautare
+  {
+    padding-right: 20%;
+    padding-top: 15%;
+  }
+}
