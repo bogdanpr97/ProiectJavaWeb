@@ -10,14 +10,18 @@
       <jsp:include page="header.jsp"></jsp:include>
       <jsp:include page="menu.jsp"></jsp:include>
  
-      <h3>Intra in cont</h3>
+      <h3>Creare cont</h3>
       <p style="color: red;">${errorString}</p>
  
-      <form method="POST" action="${pageContext.request.contextPath}/login">
+      <form method="POST" action="${pageContext.request.contextPath}/register">
          <table style="border:none">
             <tr>
                <td>Username</td>
                <td><input type="text" name="userName"/> </td>
+            </tr>
+            <tr>
+               <td>Email</td>
+               <td><input type="text" name="email"/> </td>
             </tr>
             <tr>
                <td>Parola</td>
@@ -30,12 +34,6 @@
             </tr>
          </table>
       </form>
-      <h3>Resetare parola</h3>
- 	  <form method="POST" action="${pageContext.request.contextPath}/resetareParola">
-         <div><label>Email</label></div>
-         <div style="margin-top: 0.5%;"><input type="text" name="email"/></div>
-         <div style="margin-top: 0.5%;"><input type="submit" value= "Submit" /></div>
- 	  </form>
       <jsp:include page="footer.jsp"></jsp:include>
    </body>
 </html>

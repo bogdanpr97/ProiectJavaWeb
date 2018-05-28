@@ -5,10 +5,27 @@ public class User {
 	   private String userName;
 	   private String password;
 	   private int privilege;
-	    
+	   private String disabled;
+	   private String email;
 	 
-	   public int getPrivilege() {
+	   public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public int getPrivilege() {
 		return privilege;
+	}
+
+	public String getDisabled() {
+		return disabled;
+	}
+
+	public void setDisabled(String disabled) {
+		this.disabled = disabled;
 	}
 
 	public void setPrivilege(int privilege) {

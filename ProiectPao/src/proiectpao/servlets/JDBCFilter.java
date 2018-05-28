@@ -14,8 +14,11 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
+import proiectpao.beans.User;
 import proiectpao.conn.ConnectionUtils;
+import proiectpao.utils.DBUtils;
 import proiectpao.utils.MyUtils;
 
 /**
@@ -76,7 +79,7 @@ public class JDBCFilter implements Filter {
             throws IOException, ServletException {
  
         HttpServletRequest req = (HttpServletRequest) request;
- 
+        
         // Only open connections for the special requests.
         // (For example, the path to the servlet, JSP, ..)
         // 
@@ -94,7 +97,13 @@ public class JDBCFilter implements Filter {
  
                 // Store Connection object in attribute of request.
                 MyUtils.storeConnection(request, conn);
- 
+                HttpSession session = req.getSession();
+            	if(session.getAttribute("loginedUser") != null) {
+            		User user = (User) session.getAttribute("loginedUser");
+                    if(DBUtils.statusUser(conn, user.getUserName()) == 1) {
+                    	session.setAttribute("loginedUser", null);
+                    }
+                }
                 // Allow request to go forward
                 // (Go to the next filter or target)
                 chain.doFilter(request, response);
