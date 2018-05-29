@@ -7,7 +7,17 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+
+import proiectpao.beans.Comanda;
 import proiectpao.beans.Produs;
 import proiectpao.beans.Serviciu;
 import proiectpao.beans.User;
@@ -34,6 +44,167 @@ public class DBUtils {
             return user;
         }
         return null;
+    }
+    
+    public static void finalizeOrder(Connection conn, String username, int pid, int sid, String nume,  String prenume, 
+    		String telefon, String judet, String localitate, String strada, String bloc, String apartament, String fileName) throws SQLException {
+    	
+    	String sql = "select id from users where username = ? ;";
+    	try(PreparedStatement pstm = conn.prepareStatement(sql);) {
+    		pstm.setString(1, username);
+    		try(ResultSet rs = pstm.executeQuery();) {
+    			rs.next();
+    			int uid = rs.getInt("id");
+    			String sql2 = "insert into comenzi (user_id) values ( ? );";
+    			try(PreparedStatement pstm2 = conn.prepareStatement(sql2, Statement.RETURN_GENERATED_KEYS);) {
+    				pstm2.setInt(1, uid);
+    				pstm2.executeUpdate();
+    				ResultSet rs2 = pstm2.getGeneratedKeys();
+    		        rs2.next();
+    		        int cid = rs2.getInt(1);
+    		        Produs produs = DBUtils.findProdusId(conn, pid);
+    		        int pret = Math.round(produs.getPrice());
+    				String sql3 = "insert into comenzi_detalii (id_comanda, id_produs, id_serviciu, pret, nume_poza) values ( ? , ? , ? , ? , ? )";
+    				try(PreparedStatement pstm3 = conn.prepareStatement(sql3);) {
+    					pstm3.setInt(1, cid);
+    					pstm3.setInt(2, pid);
+    					pstm3.setInt(3, sid);
+    					pstm3.setInt(4, pret);
+    					pstm3.setString(5, fileName);
+    					pstm3.executeUpdate();
+    					String sql4 = "insert into date_utilizator_comanda (comanda_id, u_id, nume, prenume, telefon, judet, localitate, strada, bloc, apartament)"
+    							+ " values ( ? , ? , ? , ? , ? , ? , ? , ? , ? , ? );";
+    					try(PreparedStatement pstm4 = conn.prepareStatement(sql4);) {
+    						pstm4.setInt(1, cid);
+    						pstm4.setInt(2, uid);
+    						pstm4.setString(3, nume);
+    						pstm4.setString(4, prenume);
+    						pstm4.setString(5, telefon);
+    						pstm4.setString(6, judet);
+    						pstm4.setString(7, localitate);
+    						pstm4.setString(8, strada);
+    						pstm4.setString(9, bloc);
+    						pstm4.setString(10, apartament);
+    						pstm4.executeUpdate();
+    						String email = DBUtils.findEmailOrder(conn, uid);
+    						String host = "smtp.mail.yahoo.com";
+    					    String port = "465";
+    					    String emailid = null;
+    					    String username2 = "robertgrmds@yahoo.com";
+    					    String password = "zxc567bnM0";
+    					    Properties props = System.getProperties();
+    					    Session l_session = null;
+    					    props.put("mail.transport.protocol", "smtp");
+    					    props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+    					    props.put("mail.smtp.host", host);
+    				        props.put("mail.smtp.auth", "true");
+    				        props.put("mail.debug", "false");
+    				        props.put("mail.smtp.port", port);
+    				        l_session = Session.getInstance(props,
+    				                new javax.mail.Authenticator() {
+    				                    protected PasswordAuthentication getPasswordAuthentication() {
+    				                        return new PasswordAuthentication(username2, password);
+    				                    }
+    				                });
+    				        l_session.setDebug(true);
+    				        try {
+    				            MimeMessage message = new MimeMessage(l_session);
+    				            emailid = "robertgrmds@yahoo.com";
+    				            message.setFrom(new InternetAddress(emailid));
+    				            message.addRecipient(Message.RecipientType.TO, new InternetAddress(email));
+    				            message.setSubject("Trimitere comanda proiectpao");
+    				            message.setContent("Comanda cu numarul " + cid + " a fost inregistrata. Veti fi anuntat cand sa veniti sa o ridicati. Multumim!", "text/html");
+    				            Transport.send(message);
+    				        } catch (MessagingException mex) {
+    				            mex.printStackTrace();
+    				        } catch (Exception e) {
+    				            e.printStackTrace();
+    				        }
+    					}
+    				}
+    			}
+    		}
+    	}
+    }
+    
+    public static boolean verifyCompatibility(Connection conn, int id, int serviceId) throws SQLException {
+    	String sql ="select * from corespondenta_p_s where id_produs = ? and id_serviciu = ? ;";
+    	
+    	try(PreparedStatement pstm = conn.prepareStatement(sql);) {
+    		pstm.setInt(1, id);
+    		pstm.setInt(2, serviceId);
+    		try(ResultSet rs = pstm.executeQuery();) {
+    			if(rs.next()) {
+    				return true;
+    			}
+    		}
+    	}
+    	return false;
+    }
+    
+    public static void confirmOrder(Connection conn, int id) throws SQLException {
+    	String sql = "update comenzi set status = 'pregatita' where id = ? ;";
+    	try(PreparedStatement pstm = conn.prepareStatement(sql);) {
+    		pstm.setInt(1, id);
+    		pstm.executeUpdate();
+    	}
+    }
+    
+    public static String findEmailOrder(Connection conn, int id) throws SQLException {
+    	String sql = "select email from users u join comenzi c on(u.id = c.user_id) where c.id = ? ;";
+    	String email = "";
+    	try(PreparedStatement pstm = conn.prepareStatement(sql);) {
+    		pstm.setInt(1, id);
+    		ResultSet rs = pstm.executeQuery();
+    		if(rs.next()) {
+    			email = rs.getString("email");
+    		}
+    	}
+    	return email;
+    }
+    
+    public static Comanda findOrder(Connection conn, int id) throws SQLException {
+    	String sql = "select * from comenzi where id = ? ;";
+    	Comanda order = null;
+    	try(PreparedStatement pstm = conn.prepareStatement(sql);) {
+    		pstm.setInt(1, id);
+    		try(ResultSet rs = pstm.executeQuery();) {
+    			String sql2 = "select * from comenzi_detalii where id_comanda = ? ;";
+    			try(PreparedStatement pstm2 = conn.prepareStatement(sql2);) {
+    				pstm2.setInt(1, id);
+    				try(ResultSet rs2 = pstm2.executeQuery();) {
+    					if(rs.next()) {
+    						if(rs2.next()) {
+    							User user = DBUtils.findUserId(conn, rs.getInt("user_id"));
+            					Produs product = DBUtils.findProdusId(conn, rs2.getInt("id_produs"));
+            					String serviceName = DBUtils.findServiciuNume(conn, rs2.getInt("id_serviciu"));
+            					order = new Comanda();
+            					order.setStatus(rs.getString("status"));
+            					order.setData(rs.getString("data"));
+            					order.setId(id);
+            					order.setNameClient(user.getUserName());
+            					order.setNameImg(rs2.getString("nume_poza"));
+            					order.setNameService(serviceName);
+            					order.setNameProduct(product.getName());
+            					order.setPrice(rs2.getInt("pret"));
+            					return order;
+    						}
+    					}
+    				}
+    			}
+    		}
+    	}
+    	return order;
+    }
+    
+    public static void resetPassword(Connection conn, String email, String parolaResetata) throws SQLException {
+    	String sql = "update users set password = ? where email = ? ;";
+    	
+    	try(PreparedStatement pstm = conn.prepareStatement(sql)) {
+    		pstm.setString(1, parolaResetata);
+    		pstm.setString(2, email);
+    		pstm.executeUpdate();
+    	}
     }
     
     public static void changePassowrd(Connection conn, User user, String parolaNoua) throws SQLException {
@@ -85,6 +256,28 @@ public class DBUtils {
         pstm.setString(2, password);
         pstm.setString(3, email);
         pstm.executeUpdate();
+    }
+    
+    public static User findUserId(Connection conn, int id) throws SQLException {
+    	 
+        String sql = "select * from users where id = ? ;";
+ 
+        PreparedStatement pstm = conn.prepareStatement(sql);
+        pstm.setInt(1, id);
+ 
+        ResultSet rs = pstm.executeQuery();
+ 
+        if (rs.next()) {
+            String password = rs.getString("password");
+            User user = new User();
+            user.setUserName("username");
+            user.setPassword(password);
+            user.setPrivilege(rs.getInt("privilegiu"));
+            user.setDisabled(rs.getString("blocat"));
+            user.setEmail("email");
+            return user;
+        }
+        return null;
     }
     
     public static User findUser(Connection conn, String userName) throws SQLException {
@@ -207,6 +400,71 @@ public class DBUtils {
     	} else {
     		return "";
     	}
+    }
+    
+    public static int recordObject(Connection conn, String name, String type) throws SQLException {
+    	int nr = 0;
+    	if(type.equals("product")) {
+			String sql = "select id from produse where nume = ? ;";
+			try(PreparedStatement pstm = conn.prepareStatement(sql)) {
+				pstm.setString(1, name);
+				try(ResultSet rs = pstm.executeQuery();) {
+					if(rs.next()) {
+						int id = rs.getInt("id");
+						String sql2 = "select count(*) as total from comenzi_detalii where id_produs = ? ;";
+						try(PreparedStatement pstm2 = conn.prepareStatement(sql2)) {
+							pstm2.setInt(1, id);
+							try(ResultSet rs2 = pstm2.executeQuery();) {
+								if(rs2.next()) {
+									nr = rs2.getInt("total");
+								}
+							}
+						}
+					}
+				}
+			}
+		} else if(type.equals("service")) {
+			String sql = "select id from servicii where nume = ? ;";
+			try(PreparedStatement pstm = conn.prepareStatement(sql)) {
+				pstm.setString(1, name);
+				try(ResultSet rs = pstm.executeQuery();) {
+					if(rs.next()) {
+						int id = rs.getInt("id");
+						String sql2 = "select count(*) as total from comenzi_detalii where id_serviciu = ? ;";
+						try(PreparedStatement pstm2 = conn.prepareStatement(sql2)) {
+							pstm2.setInt(1, id);
+							try(ResultSet rs2 = pstm2.executeQuery();) {
+								if(rs2.next()) {
+									nr = rs2.getInt("total");
+								}
+							}
+						}
+					}
+				}
+			}
+		} else if(type.equals("user")) {
+			if(DBUtils.findUser(conn, name) != null ) {
+				String sql = "select id from users where username = ? ;";
+				try(PreparedStatement pstm = conn.prepareStatement(sql);) {
+					pstm.setString(1, name);
+					try(ResultSet rs = pstm.executeQuery();) {
+						if(rs.next()) {
+							int id = rs.getInt("id");
+							String sql2 = "select count(*) as total from comenzi where user_id = ? ;";
+							try(PreparedStatement pstm2 = conn.prepareStatement(sql2)) {
+								pstm2.setInt(1, id);
+								try(ResultSet rs2 = pstm2.executeQuery();) {
+									if(rs2.next()) {
+										nr = rs2.getInt("total");
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+    	return nr;
     }
     
     public static Produs findProdus(Connection conn, String code) throws SQLException {

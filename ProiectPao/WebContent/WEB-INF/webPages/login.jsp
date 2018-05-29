@@ -31,6 +31,7 @@
          </table>
       </form>
       <h3>Resetare parola</h3>
+      <p>${resetString}</p>
  	  <form method="POST" action="${pageContext.request.contextPath}/resetareParola">
          <div><label>Email</label></div>
          <div style="margin-top: 0.5%;"><input type="text" name="email"/></div>

@@ -22,6 +22,14 @@
     		color: red;
     	}
     </style>
+    <script>
+    	$(document).ready(function() {
+    		send_order = function(aux) {
+    			var idStr = $(aux).attr("pid");
+    			$("#"+idStr).submit();
+    		}
+    	})
+    </script>
  </head>
  <body>
  
@@ -33,7 +41,7 @@
          <h4>Trebuie sa fii logat pentru a putea comanda!</h4>
     <%}%>
     <p style="color: red;">${errorString}</p>
- 
+ 	<p style="color: red;">${sendOrderString}</p>
     <table>
        <tr>
           <th>Cod</th>
@@ -46,7 +54,7 @@
           <th>Edit</th>
           <th>Delete</th>
           		<%} else {%>
-          			<th>Poza</th>
+          			<!--<th>Poza</th>-->
           			<th>Comanda</th>
           			<%}%>
           <%}%>
@@ -56,11 +64,36 @@
              <td>${product.getCode()}</td>
              <td>${product.getName()}</td>
              <td>${product.getPrice()}</td>
-             <td><select pid="${product.getId()}">
-             		<c:forEach items="${product.listaServicii}" var="serviciu" >
-             			<option value="${serviciu.getId()}">${serviciu.getName()}</option>
-             		</c:forEach>
-                 </select></td>
+             <td>
+             	<% if(session.getAttribute("loginedUser") != null) {
+          				User user = (User)session.getAttribute("loginedUser");
+          				if(user.getPrivilege() == 1) {%>			
+             	<form id="${product.getId()}" method="post" action="${pageContext.request.contextPath}/sendOrder">
+             		<input type="hidden" name="pid" value="${product.getId()}"/>
+             		<select name="serviceSelect">
+	             		<c:forEach items="${product.listaServicii}" var="serviciu" >
+	             			<option value="${serviciu.getId()}">${serviciu.getName()}</option>
+	             		</c:forEach>
+             		</select>
+             	</form>
+             </td>
+             		<td><button type="submit" onclick="send_order(this)" pid="${product.getId()}"/>Comanda</button></td>
+             	
+             			<%} else {%>
+             				<select pid="${product.getId()}">
+	             				<c:forEach items="${product.listaServicii}" var="serviciu" >
+	             					<option value="${serviciu.getId()}">${serviciu.getName()}</option>
+	             				</c:forEach>
+             				</select>
+             			<%}%>
+             	<%} else {%>
+             		<select pid="${product.getId()}">
+	             		<c:forEach items="${product.listaServicii}" var="serviciu" >
+	             			<option value="${serviciu.getId()}">${serviciu.getName()}</option>
+	             		</c:forEach>
+             		</select>
+             	<%}%>
+             </td>
              <% if(session.getAttribute("loginedUser") != null) {
           		User user = (User)session.getAttribute("loginedUser");
           		if(user.getPrivilege() == 2) {%>
@@ -70,12 +103,8 @@
              <td>
                 <a href="deleteProduct?pid=${product.getId()}">Sterge</a>
              </td>
-          		<%} else {%>
-          			<td><input type="file" name="file" pid="${product.getId()}"></input></td>
-          			<td><span class="span_comanda" onclick="send_order(this)" pid="${product.getId()}">Comanda</span></td>
-          			<%}%>
-          <%}%>
-             
+          		<%}
+          }%>
           </tr>
        </c:forEach>
     </table>

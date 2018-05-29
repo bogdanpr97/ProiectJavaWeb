@@ -15,6 +15,8 @@
           		User user = (User)session.getAttribute("loginedUser");
           		if(user.getPrivilege() == 2) {%>
           			<a href="managementUsers">Management clienti</a> |
+          			<a href="records">Rapoarte</a> |
+          			<a href="orders">Comenzi</a> |
           		<%}
    }%>
    <a href="${pageContext.request.contextPath}/logout">Logout</a>
