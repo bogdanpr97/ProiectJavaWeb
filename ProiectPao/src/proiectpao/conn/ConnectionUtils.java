@@ -6,7 +6,7 @@ import java.sql.SQLException;
 public class ConnectionUtils {
 	public static Connection getConnection() 
             throws ClassNotFoundException, SQLException {
-      // (You can change to use another database.)
+      // Data de baze pe care o folosim
        return MySQLConnUtils.getMySQLConnection();
   }
    

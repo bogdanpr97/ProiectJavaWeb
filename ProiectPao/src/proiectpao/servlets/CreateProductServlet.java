@@ -29,7 +29,7 @@ public class CreateProductServlet extends HttpServlet {
         super();
     }
  
-    // Show product creation page.
+   
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -46,8 +46,7 @@ public class CreateProductServlet extends HttpServlet {
         dispatcher.forward(request, response);
     }
  
-    // When the user enters the product information, and click Submit.
-    // This method will be called.
+    
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -83,8 +82,7 @@ public class CreateProductServlet extends HttpServlet {
         }
         
  
-        // Product ID is the string literal [a-zA-Z_0-9]
-        // with at least 1 character
+      
         String regex = "\\w+";
  
         if (code == null || !code.matches(regex)) {
@@ -99,7 +97,7 @@ public class CreateProductServlet extends HttpServlet {
                 errorString = e.getMessage();
             }
         }
-        // Store infomation to request attribute, before forward to views.
+        
         List<Serviciu> services = new ArrayList<Serviciu>();
     	try {
 			services = DBUtils.queryServicii(conn);
@@ -109,14 +107,13 @@ public class CreateProductServlet extends HttpServlet {
     	request.setAttribute("serviceList", services);
         request.setAttribute("errorString", errorString);
  
-        // If error, forward to Edit page.
+       
         if (errorString != null) {
             RequestDispatcher dispatcher = request.getServletContext()
                     .getRequestDispatcher("/WEB-INF/webPages/createProduct.jsp");
             dispatcher.forward(request, response);
         }
-        // If everything nice.
-        // Redirect to the product listing page.
+       
         else {
             response.sendRedirect(request.getContextPath() + "/products");
         }

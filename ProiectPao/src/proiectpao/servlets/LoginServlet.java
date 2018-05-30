@@ -16,9 +16,7 @@ import proiectpao.beans.User;
 import proiectpao.utils.DBUtils;
 import proiectpao.utils.MyUtils;
 
-/**
- * Servlet implementation class LoginServlet
- */
+
 @WebServlet(urlPatterns = { "/login" })
 public class LoginServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
@@ -27,13 +25,13 @@ public class LoginServlet extends HttpServlet {
         super();
     }
  
-    // Show Login page.
+    // Pagina de login
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
  
-        // Forward to /WEB-INF/views/loginView.jsp
-        // (Users can not access directly into JSP pages placed in WEB-INF)
+        //  /WEB-INF/views/loginView.jsp
+        // Userii nu pot accesa direct jsp
     	HttpSession session = request.getSession();
     	if(session.getAttribute("loginedUser") != null) {
             response.sendRedirect(request.getContextPath() + "/account");
@@ -46,8 +44,7 @@ public class LoginServlet extends HttpServlet {
         
     }
  
-    // When the user enters userName & password, and click Submit.
-    // This method will be executed.
+    //userul trimite username si parola
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -68,7 +65,7 @@ public class LoginServlet extends HttpServlet {
         } else {
             Connection conn = MyUtils.getStoredConnection(request);
             try {
-                // Find the user in the DB.
+                // Gaseste userul in db
                 user = DBUtils.findUser(conn, userName, password);
  
                 if (user == null) {
@@ -84,28 +81,26 @@ public class LoginServlet extends HttpServlet {
                 errorString = e.getMessage();
             }
         }
-        // If error, forward to /WEB-INF/views/login.jsp
+        // In caz de eroare / retrimite catre login.jsp
         if (hasError) {
             user = new User();
             user.setUserName(userName);
             user.setPassword(password);
  
-            // Store information in request attribute, before forward.
+            // salveaza in request inainte de a trimite
             request.setAttribute("errorString", errorString);
             request.setAttribute("user", user);
  
-            // Forward to /WEB-INF/views/login.jsp
+            // duce la login
             RequestDispatcher dispatcher //
                     = this.getServletContext().getRequestDispatcher("/WEB-INF/webPages/login.jsp");
  
             dispatcher.forward(request, response);
         }
-        // If no error
-        // Store user information in Session
-        // And redirect to userInfo page.
+        //salveaza in sesiune userul / trimite la account
         else {
             MyUtils.storeLoginedUser(session, user);
-            // Redirect to userInfo page.
+           
             response.sendRedirect(request.getContextPath() + "/account");
         }
     }

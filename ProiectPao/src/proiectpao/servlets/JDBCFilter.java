@@ -41,28 +41,23 @@ public class JDBCFilter implements Filter {
 		// TODO Auto-generated method stub
 	}
 	private boolean needJDBC(HttpServletRequest request) {
-        //System.out.println("JDBC Filter");
-        // 
-        // Servlet Url-pattern: /spath/*
-        // 
-        // => /spath
+       
         String servletPath = request.getServletPath();
-        // => /abc/mnp
+        
         String pathInfo = request.getPathInfo();
  
         String urlPattern = servletPath;
  
         if (pathInfo != null) {
-            // => /spath/*
+           
             urlPattern = servletPath + "/*";
         }
  
-        // Key: servletName.
-        // Value: ServletRegistration
+     
         Map<String, ? extends ServletRegistration> servletRegistrations = request.getServletContext()
                 .getServletRegistrations();
  
-        // Collection of all servlet in your Webapp.
+      
         Collection<? extends ServletRegistration> values = servletRegistrations.values();
         for (ServletRegistration sr : values) {
             Collection<String> mappings = sr.getMappings();
@@ -79,23 +74,17 @@ public class JDBCFilter implements Filter {
             throws IOException, ServletException {
  
         HttpServletRequest req = (HttpServletRequest) request;
-        
-        // Only open connections for the special requests.
-        // (For example, the path to the servlet, JSP, ..)
-        // 
-        // Avoid open connection for commons request.
-        // (For example: image, css, javascript,... )
-        // 
+     
         if (this.needJDBC(req)) {
  
-            //System.out.println("Open Connection for: " + req.getServletPath());
+            
  
             Connection conn = null;
             try {
-                // Create a Connection.
+              
                 conn = ConnectionUtils.getConnection();
  
-                // Store Connection object in attribute of request.
+                
                 MyUtils.storeConnection(request, conn);
                 HttpSession session = req.getSession();
             	if(session.getAttribute("loginedUser") != null) {
@@ -104,8 +93,7 @@ public class JDBCFilter implements Filter {
                     	session.setAttribute("loginedUser", null);
                     }
                 }
-                // Allow request to go forward
-                // (Go to the next filter or target)
+               
                 chain.doFilter(request, response);
  
             } catch (Exception e) {
@@ -115,11 +103,9 @@ public class JDBCFilter implements Filter {
                 ConnectionUtils.closeQuietly(conn);
             }
         }
-        // With commons requests (images, css, html, ..)
-        // No need to open the connection.
+       
         else {
-            // Allow request to go forward
-            // (Go to the next filter or target)
+           
             chain.doFilter(request, response);
         }
  

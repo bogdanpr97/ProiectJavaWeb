@@ -4,7 +4,7 @@
 <%@ page import="proiectpao.beans.*"%>
 <div style="padding: 5px;">
  
-   <a href="${pageContext.request.contextPath}/">Acasa</a>
+   <a href="${pageContext.request.contextPath}/home">Acasa</a>
    |
    <a href="${pageContext.request.contextPath}/products">Produse</a>
    |

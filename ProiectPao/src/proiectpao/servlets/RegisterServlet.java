@@ -66,7 +66,7 @@ public class RegisterServlet extends HttpServlet {
             errorString = "Introduceti toate campurile corect!";
         } else {
             try {
-                // Find the user in the DB.
+                // cauta userul in baza de date
                 user = DBUtils.findUser(conn, userName);
  
                 if (user != null) {
@@ -82,21 +82,19 @@ public class RegisterServlet extends HttpServlet {
                 errorString = e.getMessage();
             }
         }
-        // If error, forward to /WEB-INF/views/login.jsp
+       
         if (hasError) {
  
-            // Store information in request attribute, before forward.
+            
             request.setAttribute("errorString", errorString);
  
-            // Forward to /WEB-INF/views/login.jsp
+          
             RequestDispatcher dispatcher //
                     = this.getServletContext().getRequestDispatcher("/WEB-INF/webPages/register.jsp");
  
             dispatcher.forward(request, response);
         }
-        // If no error
-        // Store user information in Session
-        // And redirect to userInfo page.
+       
         else {
         	user = new User();
         	user.setDisabled("0");
@@ -107,18 +105,18 @@ public class RegisterServlet extends HttpServlet {
         	try {
         		DBUtils.insertUser(conn, userName, password, email);
         	} catch (SQLException e) {
-        		// Store information in request attribute, before forward.
+        		
         		errorString = "Eroare la crearea contului, incercati mai tarziu!";
                 request.setAttribute("errorString", errorString);
      
-                // Forward to /WEB-INF/views/login.jsp
+              
                 RequestDispatcher dispatcher //
                         = this.getServletContext().getRequestDispatcher("/WEB-INF/webPages/register.jsp");
      
                 dispatcher.forward(request, response);
         	}
             MyUtils.storeLoginedUser(session, user);
-            // Redirect to userInfo page.
+           
             response.sendRedirect(request.getContextPath() + "/account");
         }
 	}

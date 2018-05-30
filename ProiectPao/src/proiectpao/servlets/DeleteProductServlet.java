@@ -43,11 +43,11 @@ public class DeleteProductServlet extends HttpServlet {
             errorString = e.getMessage();
         } 
          
-        // If has an error, redirecte to the error page.
+        
         if (errorString != null) {
-            // Store the information in the request attribute, before forward to views.
+           
             request.setAttribute("errorString", errorString);
-            // 
+            
             List<Produs> list = null;
             try {
                 list = DBUtils.queryProdus(conn);
@@ -59,8 +59,7 @@ public class DeleteProductServlet extends HttpServlet {
                     .getRequestDispatcher("/WEB-INF/webPages/produse.jsp");
             dispatcher.forward(request, response);
         }
-        // If everything nice.
-        // Redirect to the product listing page.        
+            
         else {
             response.sendRedirect(request.getContextPath() + "/products");
         }

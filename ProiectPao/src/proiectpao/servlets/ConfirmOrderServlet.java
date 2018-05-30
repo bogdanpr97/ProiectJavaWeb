@@ -80,8 +80,8 @@ public class ConfirmOrderServlet extends HttpServlet {
 			String host = "smtp.mail.yahoo.com";
 		    String port = "465";
 		    String emailid = null;
-		    String username = "robertgrmds@yahoo.com";
-		    String password = "zxc567bnM0";
+		    final String username = "robertgrmds@yahoo.com";
+		    final String password = "zxc567bnM0";
 		    Properties props = System.getProperties();
 		    Session l_session = null;
 		    props.put("mail.transport.protocol", "smtp");

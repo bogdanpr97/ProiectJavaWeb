@@ -7,7 +7,7 @@ import java.sql.SQLException;
 public class MySQLConnUtils {
 	public static Connection getMySQLConnection()
 	         throws ClassNotFoundException, SQLException {
-	     // Note: Change the connection parameters accordingly.
+	     // Datele de conectare la baza
 		 String hostName = "sql7.freemysqlhosting.net:3306";
 	     String dbName = "sql7240304";
 	     String userName = "sql7240304";
@@ -21,9 +21,6 @@ public class MySQLConnUtils {
 	    
 	     Class.forName("com.mysql.jdbc.Driver");
 	  
-	     // URL Connection for MySQL:
-	     // Example: 
-	     // jdbc:mysql://localhost:3306/simplehr
 	     String connectionURL = "jdbc:mysql://" + hostName + "/" + dbName;
 	  
 	     Connection conn = DriverManager.getConnection(connectionURL, userName,

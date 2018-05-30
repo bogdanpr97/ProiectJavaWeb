@@ -29,20 +29,20 @@ public class AccountServlet extends HttpServlet {
             throws ServletException, IOException {
         HttpSession session = request.getSession();
  
-        // Check User has logged on
+        // sa fie logat
         User loginedUser = MyUtils.getLoginedUser(session);
  
-        // Not logged in
+        //nu e logat
         if (loginedUser == null) {
-            // Redirect to login page.
+            // duce la login
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
-        // Store info to the request attribute before forwarding.
+        // salveaza in request
         request.setAttribute("user", loginedUser);
  
-        // If the user has logged in, then forward to the page
-        // /WEB-INF/views/userInfoView.jsp
+        // daca e logat il duce in account jsp
+       
         RequestDispatcher dispatcher //
                 = this.getServletContext().getRequestDispatcher("/WEB-INF/webPages/account.jsp");
         dispatcher.forward(request, response);

@@ -84,7 +84,7 @@ public class FinalizeOrderServlet extends HttpServlet {
                     String fileName1 = item.getName();
                     File f = new File(fileName1);
                     fileName = f.getName();
-                    String root = "C:/Users/ONI IMPEX/eclipse-workspace/ProiectPao";
+                    String root = "C:\\Users\\dvigrup\\Downloads\\ProiectJavaWeb-master\\ProiectJavaWeb-master\\ProiectPao";
                     File path = new File(root + "/uploads");
                     if (!path.exists()) {
                         path.mkdirs();
